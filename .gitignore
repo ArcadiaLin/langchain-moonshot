@@ -1,40 +1,52 @@
-# Python
+# Python bytecode
 __pycache__/
-*.pyc
-*.pyo
-*.pyd
+*.py[cod]
+*$py.class
+
+# Virtual environments
 .venv/
 venv/
 env/
 
-# Env files
+# Tool caches
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+pip-wheel-metadata/
+
+# Environment files
 .env
 .env.*
 
-# IDE
+# IDE and editor files
 .vscode/
 .idea/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Jupyter
+# Notebook artifacts
 .ipynb_checkpoints/
 
-# Logs
+# Logs and local databases
 *.log
-
-# Build
-dist/
-build/
-
-# LangChain / local db / temp
 *.sqlite3
 *.db
 .chromadb/
 
+# Local tooling and research material
 .codex
-design.md
-references
-moonshot-docs
+.codex/
+references/
+docs/moonshot-docs/
+docs/deeoseek_integration.md
+docs/integration_publish_guiline.md

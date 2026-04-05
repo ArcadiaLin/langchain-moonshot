@@ -106,7 +106,7 @@ class ChatMoonshot(BaseChatOpenAI):
             msg = "If using default api base, MOONSHOT_API_KEY must be set."
             raise ValueError(msg)
 
-        client_params = {
+        client_params: dict[str, Any] = {
             key: value
             for key, value in {
                 "api_key": self.api_key.get_secret_value() if self.api_key else None,
@@ -120,11 +120,14 @@ class ChatMoonshot(BaseChatOpenAI):
         }
 
         if not self.client:
-            sync_specific = {"http_client": self.http_client}
-            self.root_client = openai.OpenAI(**client_params, **sync_specific)
+            sync_specific: dict[str, Any] = {"http_client": self.http_client}
+            self.root_client = openai.OpenAI(
+                **client_params,
+                **sync_specific,
+            )
             self.client = self.root_client.chat.completions
         if not self.async_client:
-            async_specific = {"http_client": self.http_async_client}
+            async_specific: dict[str, Any] = {"http_client": self.http_async_client}
             self.root_async_client = openai.AsyncOpenAI(
                 **client_params,
                 **async_specific,
@@ -355,9 +358,9 @@ class ChatMoonshot(BaseChatOpenAI):
 
     def bind_tools(
         self,
-        tools: Sequence[dict[str, Any] | type | Callable | BaseTool],
+        tools: Sequence[dict[str, Any] | type | Callable[..., Any] | BaseTool],
         *,
-        tool_choice: dict | str | bool | None = None,
+        tool_choice: dict[str, Any] | str | bool | None = None,
         strict: bool | None = None,
         parallel_tool_calls: bool | None = None,
         **kwargs: Any,

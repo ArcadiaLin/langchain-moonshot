@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.messages.ai import AIMessageChunk
 from langchain_openai.chat_models.base import BaseChatOpenAI
 from openai.types.chat import ChatCompletion, ChatCompletionChunk
+from pydantic import SecretStr
 
 from langchain_moonshot import ChatMoonshot
 
@@ -14,7 +15,7 @@ from langchain_moonshot import ChatMoonshot
 def _create_model(**kwargs: Any) -> ChatMoonshot:
     return ChatMoonshot(
         model="kimi-k2.5",
-        api_key="test-key",
+        api_key=SecretStr("test-key"),
         base_url="https://example.com/v1",
         **kwargs,
     )
@@ -124,10 +125,13 @@ def test_create_chat_result_preserves_reasoning_and_cached_tokens() -> None:
     result = model._create_chat_result(response)
     message = result.generations[0].message
 
+    assert isinstance(message, AIMessage)
     assert message.content == "hello"
     assert message.additional_kwargs["reasoning_content"] == "trace"
     assert message.response_metadata["model_provider"] == "moonshot"
+    assert message.usage_metadata is not None
     assert message.usage_metadata["input_token_details"]["cache_read"] == 5
+    assert result.llm_output is not None
     assert result.llm_output["model_provider"] == "moonshot"
     assert (
         result.llm_output["token_usage"]["prompt_tokens_details"]["cached_tokens"] == 5
@@ -181,9 +185,11 @@ def test_convert_chunk_to_generation_chunk_supports_reasoning_and_choice_usage(
     )
 
     assert generation_chunk is not None
+    assert isinstance(generation_chunk.message, AIMessageChunk)
     assert generation_chunk.message.additional_kwargs["reasoning_content"] == "step-1"
     assert generation_chunk.message.response_metadata["model_provider"] == "moonshot"
     assert generation_chunk.message.tool_call_chunks[0]["name"] == "add"
+    assert generation_chunk.message.usage_metadata is not None
     assert (
         generation_chunk.message.usage_metadata["input_token_details"]["cache_read"]
         == 2
@@ -218,11 +224,14 @@ def test_with_structured_output_downgrades_json_schema(
     )
 
     model = _create_model()
-    result = model.with_structured_output(
-        {"type": "object", "properties": {"answer": {"type": "string"}}},
-        method="json_schema",
-        include_raw=True,
-        strict=True,
+    result = cast(
+        Any,
+        model.with_structured_output(
+            {"type": "object", "properties": {"answer": {"type": "string"}}},
+            method="json_schema",
+            include_raw=True,
+            strict=True,
+        ),
     )
 
     assert result == "sentinel"

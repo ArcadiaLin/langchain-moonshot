@@ -1,0 +1,32 @@
+...............................s............ss.sss......x                [100%]
+=============================== warnings summary ===============================
+tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_astream[model0]
+tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_astream[model1]
+tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_astream_with_model_override
+tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_tool_calling_async
+  /root/.local/share/uv/python/cpython-3.13.12-linux-x86_64-gnu/lib/python3.13/asyncio/base_events.py:750: RuntimeWarning: coroutine method 'aclose' of 'SSEDecoder._aiter_chunks' was never awaited
+    self._ready.clear()
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+--------------------------- snapshot report summary ----------------------------
+1 snapshot passed.
+
+---------------------------------------------------------------------------------------- benchmark: 2 tests ---------------------------------------------------------------------------------------
+Name (time in ms)            Min                   Max                  Mean             StdDev                Median                IQR            Outliers      OPS            Rounds  Iterations
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+test_init_time           56.6889 (1.0)        104.1083 (1.0)         75.4508 (1.0)      20.3213 (1.0)         59.8174 (1.0)      36.2307 (1.0)           3;0  13.2537 (1.0)          15           1
+test_stream_time      3,331.2802 (58.76)    3,462.9771 (33.26)    3,362.4325 (44.56)    56.4308 (2.78)     3,338.1131 (55.81)    40.4868 (1.12)          1;1   0.2974 (0.02)          5           1
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Legend:
+  Outliers: 1 Standard Deviation from Mean; 1.5 IQR (InterQuartile Range) from 1st Quartile and 3rd Quartile.
+  OPS: Operations Per Second, computed as 1 / Mean
+============================= slowest 5 durations ==============================
+22.79s call     tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_stream_time
+13.57s call     tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_image_inputs
+13.51s call     tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_structured_output_optional_param
+13.36s call     tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_json_mode
+13.20s call     tests/integration_tests/test_standard.py::TestChatMoonshotIntegrationStandard::test_structured_output_pydantic_2_v1
+50 passed, 6 skipped, 1 xfailed, 4 warnings in 252.52s (0:04:12)

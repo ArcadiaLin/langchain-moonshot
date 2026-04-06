@@ -29,6 +29,8 @@ from langchain_moonshot.data._profiles import _PROFILES
 
 DEFAULT_API_BASE = "https://api.moonshot.ai/v1"
 DEFAULT_API_BASE_CN = "https://api.moonshot.cn/v1"
+_SERIALIZED_CLASS_PATH = ("langchain", "chat_models", "moonshot", "ChatMoonshot")
+_IMPORT_CLASS_PATH = ("langchain_moonshot", "chat_models", "base", "ChatMoonshot")
 
 _MODEL_PROFILES = cast("ModelProfileRegistry", _PROFILES)
 
@@ -59,6 +61,24 @@ def _normalize_token_usage(token_usage: dict[str, Any] | None) -> dict[str, Any]
     return normalized
 
 
+def _register_serializable_mapping() -> None:
+    from langchain_core.load.load import (
+        ALL_SERIALIZABLE_MAPPINGS,
+        DEFAULT_NAMESPACES,
+        _default_class_paths_cache,
+    )
+    from langchain_core.load.mapping import SERIALIZABLE_MAPPING
+
+    SERIALIZABLE_MAPPING[_SERIALIZED_CLASS_PATH] = _IMPORT_CLASS_PATH
+    ALL_SERIALIZABLE_MAPPINGS[_SERIALIZED_CLASS_PATH] = _IMPORT_CLASS_PATH
+    if "langchain_moonshot" not in DEFAULT_NAMESPACES:
+        DEFAULT_NAMESPACES.append("langchain_moonshot")
+    _default_class_paths_cache.clear()
+
+
+_register_serializable_mapping()
+
+
 class ChatMoonshot(BaseChatOpenAI):
     """Moonshot chat model integration."""
 
@@ -83,7 +103,25 @@ class ChatMoonshot(BaseChatOpenAI):
 
     @property
     def lc_secrets(self) -> dict[str, str]:
-        return {"api_key": "MOONSHOT_API_KEY"}
+        return {
+            "api_key": "MOONSHOT_API_KEY",
+            "openai_api_key": "MOONSHOT_API_KEY",
+        }
+
+    @classmethod
+    def get_lc_namespace(cls) -> list[str]:
+        return list(_SERIALIZED_CLASS_PATH[:-1])
+
+    @property
+    def lc_attributes(self) -> dict[str, Any]:
+        attributes = super().lc_attributes
+        if self.api_base not in {DEFAULT_API_BASE, DEFAULT_API_BASE_CN}:
+            attributes["openai_api_base"] = self.api_base
+        return attributes
+
+    @classmethod
+    def is_lc_serializable(cls) -> bool:
+        return True
 
     def _resolve_model_profile(self) -> ModelProfile | None:
         return _get_default_model_profile(self.model_name)
@@ -365,12 +403,13 @@ class ChatMoonshot(BaseChatOpenAI):
         parallel_tool_calls: bool | None = None,
         **kwargs: Any,
     ) -> Runnable[LanguageModelInput, AIMessage]:
-        if tool_choice in ("required", "any") or tool_choice is True:
-            msg = (
-                "Moonshot does not support forcing tool use with "
-                "tool_choice='required'."
-            )
-            raise ValueError(msg)
+        if self._is_kimi_k2_5_model() and self._thinking_is_enabled(self.thinking):
+            if tool_choice not in (None, False, "auto", "none"):
+                msg = (
+                    "kimi-k2.5 with thinking enabled only supports "
+                    "tool_choice='auto' or 'none'."
+                )
+                raise ValueError(msg)
 
         return super().bind_tools(
             tools,

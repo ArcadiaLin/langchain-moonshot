@@ -35,6 +35,43 @@ For local development:
 uv sync --group dev --group test_integration
 ```
 
+## Standard Tests
+
+This repository keeps only LangChain standard chat-model tests under `tests/`:
+
+- `tests/unit_tests/test_standard.py`
+- `tests/integration_tests/test_standard.py`
+
+Run the full standard suite in the current `uv` project and write the output to
+`pytest_standard.txt`:
+
+```bash
+RUN_MOONSHOT_INTEGRATION=1 uv run pytest tests/unit_tests/test_standard.py tests/integration_tests/test_standard.py -q > pytest_standard.txt 2>&1
+```
+
+Run only the unit standard tests:
+
+```bash
+uv run pytest tests/unit_tests/test_standard.py -q > pytest_standard.txt 2>&1
+```
+
+Run only the live integration standard tests:
+
+```bash
+RUN_MOONSHOT_INTEGRATION=1 uv run pytest tests/integration_tests/test_standard.py -q > pytest_standard.txt 2>&1
+```
+
+Live integration tests require `RUN_MOONSHOT_INTEGRATION=1` and `MOONSHOT_API_KEY`.
+
+Current standard-test coverage and behavior:
+
+- Default live standard model: `kimi-k2.5` with `thinking=False` and `temperature=0.6`
+- All standard tests in this repository are constrained to `kimi-k2.5`; the suite does not switch to any other Moonshot model
+- Covered by standard tests: serialization, env-based init, tool calling, structured output, `json_mode`, image inputs, streaming, async, and VCR-backed `test_stream_time`
+- Standard tests intentionally keep these capabilities unsupported: forced `tool_choice`, runtime `model` override, PDF inputs, audio inputs, image/PDF tool messages, and Anthropic-style inputs
+- Known expected limitation: `output_version="v1"` streaming tool calls can emit a natural-language preamble before the tool chunk stream, so the standard `test_tool_calling` path for that variant is marked `xfail`
+- Practical boundary: for day-to-day use, prefer `invoke()` or default streaming output for tool calling; do not rely on `output_version="v1"` streamed `content_blocks` as the sole source of tool-call arguments
+
 ## Credentials
 
 Create a Moonshot API key in the Moonshot console, then set `MOONSHOT_API_KEY`.
@@ -266,16 +303,17 @@ print(result["messages"][-1].content)
 - When `thinking=True`, `kimi-k2.5` expects `temperature=1.0`.
 - When `thinking=False`, `kimi-k2.5` expects `temperature=0.6`.
 - For `kimi-k2.5`, `top_p` must remain `0.95`, `n` must remain `1`, and both penalties must remain `0.0`.
-- Forced tool usage via `tool_choice="required"` is rejected by this integration.
+- The integration accepts standard `tool_choice` values for API compatibility.
+- Moonshot does not reliably force tool calls in live tests, so forced `tool_choice` is treated as unsupported in standard tests.
+- For `kimi-k2.5` with `thinking=True`, tool forcing still must remain `tool_choice="auto"` or `"none"`.
 - Moonshot builtin `$web_search` is rejected when `thinking=True`.
 
 ## Local Verification
 
 ```bash
-env UV_CACHE_DIR=/tmp/uv-cache uv run ruff check .
-env UV_CACHE_DIR=/tmp/uv-cache uv run mypy langchain_moonshot tests
-env UV_CACHE_DIR=/tmp/uv-cache uv run pytest tests/unit_tests
-RUN_MOONSHOT_INTEGRATION=1 env UV_CACHE_DIR=/tmp/uv-cache uv run pytest tests/integration_tests
+uv run ruff check .
+uv run mypy langchain_moonshot tests
+uv run pytest tests/unit_tests/test_standard.py
+RUN_MOONSHOT_INTEGRATION=1 uv run pytest tests/integration_tests/test_standard.py
+RUN_MOONSHOT_INTEGRATION=1 uv run pytest tests/unit_tests/test_standard.py tests/integration_tests/test_standard.py -q > pytest_standard.txt 2>&1
 ```
-
-Manual smoke scripts remain available under [`scripts/`](./scripts) for exploratory checks across streaming, tools, vision, model matrices, and LangGraph agent flows.

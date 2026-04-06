@@ -1,0 +1,40 @@
+# serializer version: 1
+# name: TestChatMoonshotStandard.test_serdes[serialized]
+  dict({
+    'id': list([
+      'langchain',
+      'chat_models',
+      'moonshot',
+      'ChatMoonshot',
+    ]),
+    'kwargs': dict({
+      'api_base': 'https://example.com/v1',
+      'api_key': dict({
+        'id': list([
+          'MOONSHOT_API_KEY',
+        ]),
+        'lc': 1,
+        'type': 'secret',
+      }),
+      'max_retries': 2,
+      'max_tokens': 100,
+      'model_name': 'kimi-k2.5',
+      'openai_api_base': 'https://example.com/v1',
+      'openai_api_key': dict({
+        'id': list([
+          'MOONSHOT_API_KEY',
+        ]),
+        'lc': 1,
+        'type': 'secret',
+      }),
+      'request_timeout': 60.0,
+      'stop': list([
+      ]),
+      'temperature': 0.6,
+      'thinking': False,
+    }),
+    'lc': 1,
+    'name': 'ChatMoonshot',
+    'type': 'constructor',
+  })
+# ---

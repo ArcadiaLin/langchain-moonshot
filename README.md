@@ -25,6 +25,12 @@ It provides a `ChatMoonshot` implementation built on top of `langchain-openai`, 
 
 ## Installation
 
+Install from PyPI:
+
+```bash
+pip install langchain-moonshot
+```
+
 For local development:
 
 ```bash

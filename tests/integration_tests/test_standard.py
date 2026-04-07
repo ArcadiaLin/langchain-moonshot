@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from langchain_core.language_models import BaseChatModel
@@ -12,9 +13,14 @@ from tests.integration_tests._live_config import (
     LIVE_RATE_LIMITER,
 )
 
-ChatModelIntegrationTests = pytest.importorskip(
-    "langchain_tests.integration_tests"
-).ChatModelIntegrationTests
+if TYPE_CHECKING:
+    from langchain_tests.integration_tests import (
+        ChatModelIntegrationTests as _ChatModelIntegrationTests,
+    )
+else:
+    _ChatModelIntegrationTests = pytest.importorskip(
+        "langchain_tests.integration_tests"
+    ).ChatModelIntegrationTests
 
 pytestmark = pytest.mark.skipif(
     not (
@@ -28,13 +34,13 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-class TestChatMoonshotIntegrationStandard(ChatModelIntegrationTests):
+class TestChatMoonshotIntegrationStandard(_ChatModelIntegrationTests):
     @property
     def chat_model_class(self) -> type[BaseChatModel]:
         return ChatMoonshot
 
     @property
-    def chat_model_params(self) -> dict:
+    def chat_model_params(self) -> dict[str, Any]:
         return {
             "model": "kimi-k2.5",
             "api_key": os.environ["MOONSHOT_API_KEY"],

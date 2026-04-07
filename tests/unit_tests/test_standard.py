@@ -1,24 +1,27 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import pytest
 from langchain_core.language_models import BaseChatModel
 
 from langchain_moonshot import ChatMoonshot
 
-ChatModelUnitTests = pytest.importorskip(
-    "langchain_tests.unit_tests"
-).ChatModelUnitTests
+if TYPE_CHECKING:
+    from langchain_tests.unit_tests import ChatModelUnitTests as _ChatModelUnitTests
+else:
+    _ChatModelUnitTests = pytest.importorskip(
+        "langchain_tests.unit_tests"
+    ).ChatModelUnitTests
 
 
-class TestChatMoonshotStandard(ChatModelUnitTests):
+class TestChatMoonshotStandard(_ChatModelUnitTests):
     @property
     def chat_model_class(self) -> type[BaseChatModel]:
         return ChatMoonshot
 
     @property
-    def chat_model_params(self) -> dict:
+    def chat_model_params(self) -> dict[str, Any]:
         return {
             "model": "kimi-k2.5",
             "api_key": "test-key",
@@ -81,7 +84,9 @@ class TestChatMoonshotStandard(ChatModelUnitTests):
         return {"invoke": [], "stream": []}
 
     @property
-    def init_from_env_params(self) -> tuple[dict, dict, dict]:
+    def init_from_env_params(
+        self,
+    ) -> tuple[dict[str, str], dict[str, object], dict[str, str]]:
         return (
             {
                 "MOONSHOT_API_KEY": "env-key",

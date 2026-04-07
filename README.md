@@ -2,6 +2,14 @@
 
 `langchain-moonshot` is a standalone LangChain integration package for Moonshot AI chat models.
 
+## Upgrade Notes
+
+`0.1.0` is a breaking rewrite of the package.
+
+- If you are upgrading from `0.0.6` or `0.0.7`, note that the old PyPI releases exposed `OpenAI`, `ChatOpenAI`, and `OpenAIEmbeddings`.
+- Starting with `0.1.0`, this project is rebuilt around `ChatMoonshot` as the primary public integration.
+- The project homepage/repository has moved from `https://github.com/RyanFeiluX/langchain_moonshot` to `https://github.com/ArcadiaLin/langchain-moonshot`.
+
 It provides a `ChatMoonshot` implementation built on top of `langchain-openai`, with Moonshot-specific support for:
 
 - `reasoning_content` in non-streaming and streaming responses

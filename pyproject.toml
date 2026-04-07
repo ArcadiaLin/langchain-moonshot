@@ -5,7 +5,9 @@ build-backend = "hatchling.build"
 [project]
 name = "langchain-moonshot"
 description = "An integration package connecting Moonshot AI and LangChain"
-license = { text = "MIT" }
+authors = [{ name = "ArcadiaLin" }]
+keywords = ["langchain", "moonshot", "moonshot-ai", "llm", "chat-model"]
+license = "MIT"
 license-files = ["LICENSE"]
 readme = "README.md"
 version = "0.1.0"
@@ -28,8 +30,8 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/ArcadiaLin/langchain-moonshot"
-Source = "https://github.com/ArcadiaLin/langchain-moonshot"
-Documentation = "https://github.com/ArcadiaLin/langchain-moonshot/tree/main/docs"
+Repository = "https://github.com/ArcadiaLin/langchain-moonshot"
+Issues = "https://github.com/ArcadiaLin/langchain-moonshot/issues"
 Changelog = "https://github.com/ArcadiaLin/langchain-moonshot/blob/main/CHANGELOG.md"
 
 [dependency-groups]
